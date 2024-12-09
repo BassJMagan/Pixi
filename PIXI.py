@@ -8,6 +8,7 @@ import huggingface_hub
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
+import pyperclip
 import webbrowser
 
 # ONNX Model Details
@@ -63,7 +64,7 @@ class TaggerPredictor:
         sorted_tags = sorted(tags_with_scores, key=lambda x: x[1], reverse=True)
 
         # Return tags above a confidence threshold, formatted without scores
-        tags = [tag.replace("_", " ") for tag, score in sorted_tags if score > 0.30]
+        tags = [tag.replace("_", " ") for tag, score in sorted_tags if score > 0.35]
         return ", ".join(tags)
 
 
@@ -104,9 +105,9 @@ predictor = TaggerPredictor()
 with gr.Blocks() as demo:
     with gr.Column():
         random_btn = gr.Button("Fetch Random Ranked Image")
-        random_output = gr.Image(label="Random Pixiv Image")
+        random_output = gr.Image()  # Removed the label
         get_tags_btn = gr.Button("Get Tags")
-        tags_output = gr.Textbox(label="Predicted Tags")
+        tags_output = gr.Textbox(label="Predicted Tags", interactive=False, lines=2)
 
         # Fetch and display random image
         def fetch_image():
@@ -118,7 +119,11 @@ with gr.Blocks() as demo:
         def get_tags(image):
             if image is None:
                 return "No image loaded!"
-            return predictor.predict_tags(image)
+            tags = predictor.predict_tags(image)
+            
+            # Automatically copy tags to clipboard after displaying
+            pyperclip.copy(tags)
+            return tags
 
         get_tags_btn.click(get_tags, inputs=random_output, outputs=tags_output)
 
