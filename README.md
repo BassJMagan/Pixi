@@ -4,7 +4,7 @@ Python script to get random images from Pixiv and then tag them with Smilingwolf
 To use simply:
 
 
-```pip install gradio huggingface_hub onnxruntime pandas numpy pillow requests```
+```pip install gradio huggingface_hub onnxruntime pandas numpy pillow requests pyperclip```
 
 
 Then you're good to go, run the script and it'll open a Gradio window in your browser with two simple buttons.
