@@ -69,7 +69,7 @@ class TaggerPredictor:
 
 # Function to Fetch Random Pixiv Ranked Image
 def get_random_pixiv_ranked_image():
-    modes = ['day', 'week', 'month']
+    modes = ['day', 'week', 'month', 'day_male', 'day_female', 'week_original', 'day_r18', 'day_male_18', 'day_female_r18', 'week_r18', 'week_r18g']
     mode = random.choice(modes)
     random_date = datetime.now() - timedelta(days=random.randint(0, 730))
     formatted_date = random_date.strftime('%Y-%m-%d')
