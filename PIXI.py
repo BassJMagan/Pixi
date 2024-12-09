@@ -69,32 +69,34 @@ class TaggerPredictor:
 
 # Function to Fetch Random Pixiv Ranked Image
 def get_random_pixiv_ranked_image():
-    modes = ['day', 'week', 'month', 'day_male', 'day_female', 'week_original', 'day_r18', 'day_male_18', 'day_female_r18', 'week_r18']
-    mode = random.choice(modes)
-    random_date = datetime.now() - timedelta(days=random.randint(0, 6096))
-    formatted_date = random_date.strftime('%Y-%m-%d')
+    while True:
+        modes = ['day', 'week', 'month', 'day_male', 'day_female', 'week_original', 'week_rookie', 'day_r18', 'day_male_18', 'day_female_r18', 'week_r18']
+        mode = random.choice(modes)
+        random_date = datetime.now() - timedelta(days=random.randint(0, 6096))
+        formatted_date = random_date.strftime('%Y-%m-%d')
 
-    try:
-        rank_url = f"https://api.obfs.dev/api/pixiv/rank?mode={mode}&date={formatted_date}"
-        rank_response = requests.get(rank_url)
-        rank_data = rank_response.json()
+        try:
+            rank_url = f"https://api.obfs.dev/api/pixiv/rank?mode={mode}&date={formatted_date}"
+            rank_response = requests.get(rank_url)
+            rank_data = rank_response.json()
 
-        # Choose a random image
-        illust = random.choice(rank_data['illusts'])
-        image_url = (illust['meta_pages'][0]['image_urls']['original']
-                     if illust['meta_pages']
-                     else illust['meta_single_page']['original_image_url'])
+            # Choose a random image
+            illust = random.choice(rank_data['illusts'])
+            image_url = (illust['meta_pages'][0]['image_urls']['original']
+                         if illust['meta_pages']
+                         else illust['meta_single_page']['original_image_url'])
 
-        headers = {
-            'Referer': 'https://www.pixiv.net',
-            'User-Agent': 'Mozilla/5.0'
-        }
-        image_response = requests.get(image_url, headers=headers)
-        image = Image.open(io.BytesIO(image_response.content))
-        return image
+            headers = {
+                'Referer': 'https://www.pixiv.net',
+                'User-Agent': 'Mozilla/5.0'
+            }
+            image_response = requests.get(image_url, headers=headers)
+            image = Image.open(io.BytesIO(image_response.content))
+            return image
 
-    except Exception as e:
-        return None
+        except Exception as e:
+            print(f"Attempt failed: {e}")
+            continue
 
 
 # Instantiate Tagger Predictor
