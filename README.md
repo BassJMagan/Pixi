@@ -9,5 +9,4 @@ To use simply:
 
 Then you're good to go, run the script and it'll open a Gradio window in your browser with two simple buttons.
 
-![{7BA6F88E-5F7B-4DDC-8466-2CA6D8C28FEC}](https://github.com/user-attachments/assets/a892b403-7b32-40cc-9fb1-fab80c8c8fbe)
-
+![{DE6CE823-8A70-44D3-9B75-E9655D92365B}](https://github.com/user-attachments/assets/1e723c5a-c2a1-4c34-a248-4799df3313fd)
