@@ -2,18 +2,33 @@ import gradio as gr
 import requests
 import random
 from datetime import datetime, timedelta
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
 import huggingface_hub
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
-import webbrowser
 
 # ONNX Model Details
 MODEL_REPO = "SmilingWolf/wd-vit-large-tagger-v3"
 MODEL_FILENAME = "model.onnx"
 LABEL_FILENAME = "selected_tags.csv"
+
+# JavaScript for Enter and Spacebar Functionality
+keyboard_js = """
+<script>
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") { 
+        event.preventDefault();
+        document.getElementById('fetch_btn').click(); // Trigger "Fetch Random Image"
+    }
+    if (event.key === " ") { 
+        event.preventDefault();
+        document.getElementById('tags_btn').click(); // Trigger "Get Tags"
+    }
+});
+</script>
+"""
 
 # Predictor Class for ONNX Inference
 class TaggerPredictor:
@@ -67,6 +82,8 @@ class TaggerPredictor:
         return ", ".join(tags)
 
 
+predictor = TaggerPredictor()
+
 # Function to Fetch Random Pixiv Ranked Image
 def get_random_pixiv_ranked_image():
     while True:
@@ -99,15 +116,12 @@ def get_random_pixiv_ranked_image():
             continue
 
 
-# Instantiate Tagger Predictor
-predictor = TaggerPredictor()
-
 # Gradio UI
-with gr.Blocks() as demo:
+with gr.Blocks(head=keyboard_js) as demo:
     with gr.Column():
-        random_btn = gr.Button("Fetch Random Ranked Image")
-        random_output = gr.Image()
-        get_tags_btn = gr.Button("Get Tags")
+        random_btn = gr.Button("Fetch Random Ranked Image", elem_id="fetch_btn")
+        random_output = gr.Image(label="Random Image", elem_id="image_output")
+        get_tags_btn = gr.Button("Get Tags", elem_id="tags_btn")
         tags_output = gr.Textbox(label="Predicted Tags")
 
         # Fetch and display random image
@@ -124,6 +138,5 @@ with gr.Blocks() as demo:
 
         get_tags_btn.click(get_tags, inputs=random_output, outputs=tags_output)
 
-# Launch App and Open in Default Browser
 if __name__ == "__main__":
     demo.launch(server_port=7860, inbrowser=True)
