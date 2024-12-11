@@ -97,35 +97,36 @@ def get_random_gelbooru_image():
         "Referer": "https://gelbooru.com"
     }
 
-    try:
-        # Fetch the random page
-        response = requests.get(gelbooru_random_url, headers=headers)
-        response.raise_for_status()
+    while True:  # Keep trying until a valid image is found
+        try:
+            # Fetch the random page
+            response = requests.get(gelbooru_random_url, headers=headers)
+            response.raise_for_status()
 
-        # Extract image URL using HTML parsing
-        soup = BeautifulSoup(response.text, 'html.parser')
-        img_tag = soup.find("img", {"id": "image"})  # Gelbooru's main image tag
+            # Extract image URL using HTML parsing
+            soup = BeautifulSoup(response.text, 'html.parser')
+            img_tag = soup.find("img", {"id": "image"})  # Gelbooru's main image tag
 
-        if img_tag and 'src' in img_tag.attrs:
-            image_url = img_tag['src']
+            if img_tag and 'src' in img_tag.attrs:
+                image_url = img_tag['src']
 
-            # Ensure the URL is absolute
-            if not image_url.startswith("http"):
-                image_url = f"https:{image_url}"
+                # Ensure the URL is absolute
+                if not image_url.startswith("http"):
+                    image_url = f"https:{image_url}"
 
-            # Fetch and return the image
-            image_response = requests.get(image_url, headers=headers)
-            image_response.raise_for_status()
+                # Fetch and return the image
+                image_response = requests.get(image_url, headers=headers)
+                image_response.raise_for_status()
 
-            image = Image.open(io.BytesIO(image_response.content))
-            return image
+                image = Image.open(io.BytesIO(image_response.content))
+                return image
 
-        else:
-            raise Exception("Failed to locate image URL on the page.")
+            else:
+                raise Exception("Failed to locate image URL on the page.")
 
-    except Exception as e:
-        print(f"Error fetching Gelbooru image: {e}")
-        return None
+        except Exception as e:
+            print(f"Error fetching Gelbooru image: {e}")
+            continue
 
 # Function to Fetch Random Pixiv Ranked Image
 def get_random_pixiv_ranked_image():
