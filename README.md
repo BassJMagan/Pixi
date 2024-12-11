@@ -9,4 +9,10 @@ To use simply paste this in cmd/terminal/powershell with Python installed (I'm u
 
 Then you're good to go, run the script and it'll open a Gradio window in your browser with two simple buttons.
 
-![{DE6CE823-8A70-44D3-9B75-E9655D92365B}](https://github.com/user-attachments/assets/1e723c5a-c2a1-4c34-a248-4799df3313fd)
+![{5B949FF5-E71D-46AA-84AE-5636E22351EF}](https://github.com/user-attachments/assets/04579527-7ba6-4656-9475-39533f217891)
+
+
+Hotkeys:
+Enter = Fetch random Gelbooru image
+p/P = Fetch random ranked Pixiv image
+Space = Get Tags
