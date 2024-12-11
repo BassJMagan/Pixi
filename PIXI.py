@@ -10,7 +10,7 @@ import onnxruntime as rt
 import pandas as pd
 
 # ONNX Model Details
-MODEL_REPO = "SmilingWolf/wd-vit-large-tagger-v3"
+MODEL_REPO = "SmilingWolf/wd-eva02-large-tagger-v3"
 MODEL_FILENAME = "model.onnx"
 LABEL_FILENAME = "selected_tags.csv"
 
@@ -120,7 +120,7 @@ def get_random_pixiv_ranked_image():
 with gr.Blocks(head=keyboard_js) as demo:
     with gr.Column():
         random_btn = gr.Button("Fetch Random Ranked Image", elem_id="fetch_btn")
-        random_output = gr.Image(label="Random Image", elem_id="image_output")
+        random_output = gr.Image(elem_id="image_output")
         get_tags_btn = gr.Button("Get Tags", elem_id="tags_btn")
         tags_output = gr.Textbox(label="Predicted Tags")
 
