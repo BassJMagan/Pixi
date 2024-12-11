@@ -70,15 +70,12 @@ class TaggerPredictor:
 
     def predict_tags(self, image):
         self.load_model()
-
         input_name = self.model.get_inputs()[0].name
         output_name = self.model.get_outputs()[0].name
         image_input = self.prepare_image(image)
-
         predictions = self.model.run([output_name], {input_name: image_input})[0][0]
         tags_with_scores = list(zip(self.tag_names, predictions))
         sorted_tags = sorted(tags_with_scores, key=lambda x: x[1], reverse=True)
-
         tags = [tag.replace("_", " ") for tag, score in sorted_tags if score > 0.30]
         return ", ".join(tags)
 
