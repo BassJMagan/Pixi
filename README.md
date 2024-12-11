@@ -4,7 +4,7 @@ Python script to get random images from Pixiv and then tag them with Smilingwolf
 To use simply paste this in cmd/terminal/powershell with Python installed (I'm using version 3.12):
 
 
-```pip install gradio huggingface_hub onnxruntime pandas numpy pillow requests```
+```pip install gradio huggingface_hub onnxruntime pandas numpy pillow requests pyperclip beautifulsoup4```
 
 
 Then you're good to go, run the script and it'll open a Gradio window in your browser with two simple buttons.
@@ -13,6 +13,9 @@ Then you're good to go, run the script and it'll open a Gradio window in your br
 
 
 Hotkeys:
+
 Enter = Fetch random Gelbooru image
+
 p/P = Fetch random ranked Pixiv image
+
 Space = Get Tags
