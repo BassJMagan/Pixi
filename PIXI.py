@@ -9,6 +9,7 @@ import numpy as np
 import onnxruntime as rt
 import pandas as pd
 from bs4 import BeautifulSoup
+import pyperclip
 
 MODEL_REPO = "SmilingWolf/wd-eva02-large-tagger-v3"
 MODEL_FILENAME = "model.onnx"
@@ -25,7 +26,7 @@ document.addEventListener("keydown", function(event) {
         event.preventDefault();
         document.getElementById('fetch_btn').click(); // Trigger "Fetch Random Ranked Image"
     }
-        if (event.key === " ") { 
+    if (event.key === " ") { 
         event.preventDefault();
         document.getElementById('tags_btn').click(); // Trigger "Get Tags"
     }
@@ -61,7 +62,7 @@ class TaggerPredictor:
         image = image.convert("RGB")
         image = image.resize((self.model_target_size, self.model_target_size), Image.BICUBIC)
         image_array = np.asarray(image, dtype=np.float32)
-        image_array = image_array[:, :, ::-1]  # RGB -> BGR
+        image_array = image_array[:, :, ::-1]
         return np.expand_dims(image_array, axis=0)
 
     def predict_tags(self, image):
@@ -158,13 +159,14 @@ with gr.Blocks(head=keyboard_js) as demo:
             return get_random_pixiv_ranked_image()
 
         random_btn.click(fetch_image, outputs=random_output)
-
         gelbooru_btn.click(get_random_gelbooru_image, outputs=random_output)
 
         def get_tags(image):
             if image is None:
                 return "No image loaded!"
-            return predictor.predict_tags(image)
+            tags = predictor.predict_tags(image)
+            pyperclip.copy(tags)
+            return tags
 
         get_tags_btn.click(get_tags, inputs=random_output, outputs=tags_output)
 
