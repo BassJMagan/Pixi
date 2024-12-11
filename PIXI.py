@@ -8,21 +8,26 @@ import huggingface_hub
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
+from bs4 import BeautifulSoup  # Add BeautifulSoup for HTML parsing
 
 # ONNX Model Details
 MODEL_REPO = "SmilingWolf/wd-eva02-large-tagger-v3"
 MODEL_FILENAME = "model.onnx"
 LABEL_FILENAME = "selected_tags.csv"
 
-# JavaScript for Enter and Spacebar Functionality
+# JavaScript for Enter and P Key Functionality
 keyboard_js = """
 <script>
 document.addEventListener("keydown", function(event) {
     if (event.key === "Enter") { 
         event.preventDefault();
-        document.getElementById('fetch_btn').click(); // Trigger "Fetch Random Image"
+        document.getElementById('gelbooru_btn').click(); // Trigger "Fetch Random Gelbooru Image"
     }
-    if (event.key === " ") { 
+    if (event.key === "p" || event.key === "P") { 
+        event.preventDefault();
+        document.getElementById('fetch_btn').click(); // Trigger "Fetch Random Ranked Image"
+    }
+        if (event.key === " ") { 
         event.preventDefault();
         document.getElementById('tags_btn').click(); // Trigger "Get Tags"
     }
@@ -84,6 +89,44 @@ class TaggerPredictor:
 
 predictor = TaggerPredictor()
 
+# Function to Fetch Random Gelbooru Image
+def get_random_gelbooru_image():
+    gelbooru_random_url = "https://gelbooru.com/index.php?page=post&s=random"
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://gelbooru.com"
+    }
+
+    try:
+        # Fetch the random page
+        response = requests.get(gelbooru_random_url, headers=headers)
+        response.raise_for_status()
+
+        # Extract image URL using HTML parsing
+        soup = BeautifulSoup(response.text, 'html.parser')
+        img_tag = soup.find("img", {"id": "image"})  # Gelbooru's main image tag
+
+        if img_tag and 'src' in img_tag.attrs:
+            image_url = img_tag['src']
+
+            # Ensure the URL is absolute
+            if not image_url.startswith("http"):
+                image_url = f"https:{image_url}"
+
+            # Fetch and return the image
+            image_response = requests.get(image_url, headers=headers)
+            image_response.raise_for_status()
+
+            image = Image.open(io.BytesIO(image_response.content))
+            return image
+
+        else:
+            raise Exception("Failed to locate image URL on the page.")
+
+    except Exception as e:
+        print(f"Error fetching Gelbooru image: {e}")
+        return None
+
 # Function to Fetch Random Pixiv Ranked Image
 def get_random_pixiv_ranked_image():
     while True:
@@ -119,16 +162,21 @@ def get_random_pixiv_ranked_image():
 # Gradio UI
 with gr.Blocks(head=keyboard_js) as demo:
     with gr.Column():
-        random_btn = gr.Button("Fetch Random Ranked Image", elem_id="fetch_btn")
+        with gr.Row():  # Adding a Row container to place buttons side by side
+            random_btn = gr.Button("Fetch Random Ranked Image", elem_id="fetch_btn")
+            gelbooru_btn = gr.Button("Fetch Random Gelbooru Image", elem_id="gelbooru_btn")
         random_output = gr.Image(elem_id="image_output")
         get_tags_btn = gr.Button("Get Tags", elem_id="tags_btn")
         tags_output = gr.Textbox(label="Predicted Tags")
 
-        # Fetch and display random image
+        # Fetch and display random image from Pixiv
         def fetch_image():
             return get_random_pixiv_ranked_image()
 
         random_btn.click(fetch_image, outputs=random_output)
+
+        # Fetch and display random image from Gelbooru
+        gelbooru_btn.click(get_random_gelbooru_image, outputs=random_output)
 
         # Run model inference on the displayed image
         def get_tags(image):
